@@ -241,10 +241,11 @@ namespace fgui {
         }
 
         protected loadContent(): void {
-            this.clearContent();
-
-            if (!this._url)
+            if (!this._url){
+                //清空
+                this.clearContent();
                 return;
+            }
 
             if (ToolSet.startsWith(this._url, "ui://"))
                 this.loadFromPackage(this._url);
@@ -314,8 +315,15 @@ namespace fgui {
                 || ToolSet.startsWith(this._url, "https://")
                 || ToolSet.startsWith(this._url, '/'))
                 cc.loader.load(this._url, this.onLoaded.bind(this));
-            else
-                cc.loader.loadRes(this._url, cc.Asset, this.onLoaded.bind(this));
+            else{
+                let asset = cc.loader.getRes(this._url);
+                if(!asset){
+                    cc.loader.loadRes(this._url, cc.Asset, this.onLoaded.bind(this));
+                }else{
+                    //已经加载过缓存
+                    this.onLoaded(null,asset);
+                }
+            }
         }
 
         private onLoaded(err, asset): void {
