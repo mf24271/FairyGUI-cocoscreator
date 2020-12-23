@@ -26,10 +26,14 @@ gulp.task("copy", () => {
     return gulp.src('bin/**/*')
         .pipe(gulp.dest('../demo/assets/Script/Lib/'))
 });
-
+gulp.task("copy2", () => {
+    return gulp.src('bin/**/*')
+        .pipe(gulp.dest('../../p15/p15_client/assets/scripts/fgui/'))
+});
 gulp.task('build', gulp.series(
     gulp.parallel('buildJs'),
     gulp.parallel('buildDts'),
-    gulp.parallel('copy')
+    gulp.parallel('copy'),
+    gulp.parallel('copy2')
 )
 )

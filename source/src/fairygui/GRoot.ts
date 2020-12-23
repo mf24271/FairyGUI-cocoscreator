@@ -25,7 +25,8 @@ namespace fgui {
 
         public static create(): GRoot {
             GRoot._inst = new GRoot();
-            GRoot._inst.node.parent = cc.director.getScene();
+            let node = cc.Canvas.instance.node.getChildByName("node_fgui_root")
+            GRoot._inst.node.parent = node;//cc.director.getScene();
 
             return GRoot._inst;
         }
@@ -55,6 +56,8 @@ namespace fgui {
             else {
                 (<any>cc.view).on('canvas-resize', this._thisOnResized);
             }
+            let node = cc.Canvas.instance.node.getChildByName("node_fgui_root")
+            node.on('size-changed', this._thisOnResized)
 
             this.onWinResize();
         }
@@ -66,6 +69,8 @@ namespace fgui {
             else {
                 (<any>cc.view).off('canvas-resize', this._thisOnResized);
             }
+            let node = cc.Canvas.instance.node.getChildByName("node_fgui_root")
+            node.off('size-changed', this._thisOnResized)
 
             if (this == GRoot._inst)
                 GRoot._inst = null;
@@ -400,7 +405,7 @@ namespace fgui {
             }
         }
 
-        private onWinResize(): void {
+        private onWinResizeOld(): void {
             let size = cc.view.getCanvasSize();
             size.width /= cc.view.getScaleX();
             size.height /= cc.view.getScaleY();
@@ -409,6 +414,20 @@ namespace fgui {
             pos.x = pos.x / cc.view.getScaleX();
             pos.y = pos.y / cc.view.getScaleY();
 
+            this.setSize(size.width, size.height);
+            this._node.setPosition(-pos.x, this._height - pos.y);
+
+            this.updateContentScaleLevel();
+        }
+
+        private onWinResize(): void {
+            let node = cc.Canvas.instance.node.getChildByName("node_fgui_root")
+            console.log(node, node.width, node.height)
+            var size = cc.size(node.width, node.height)
+            var pos = cc.view.getViewportRect().origin;
+            pos.x = 0
+            pos.y = 0
+            console.log("fgui root size", size)
             this.setSize(size.width, size.height);
             this._node.setPosition(-pos.x, this._height - pos.y);
 

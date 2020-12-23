@@ -736,7 +736,7 @@ namespace fgui {
         protected onDisable() {
         }
 
-        protected onUpdate(dt) {
+        protected onUpdate(dt?: number) {
         }
 
         protected onDestroy() {

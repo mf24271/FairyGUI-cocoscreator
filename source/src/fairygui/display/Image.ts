@@ -14,7 +14,7 @@ namespace fgui {
         public constructor() {
             super();
         }
-        
+
         public get flip(): FlipType {
             return this._flip;
         }
@@ -136,8 +136,8 @@ namespace fgui {
                 if (!material) {
                     material = (<any>cc.Material).getBuiltinMaterial('2d-gray-sprite');
                 }
-                if ((<any>cc.Material).getInstantiatedMaterial) {
-                    material = this._graySpriteMaterial = (<any>cc.Material).getInstantiatedMaterial(material, this);
+                if ((<any>cc.MaterialVariant).create) {
+                    material = this._graySpriteMaterial = (<any>cc.MaterialVariant).create(material, this);
                 } else {
                     material = this._graySpriteMaterial = (<any>cc.Material).create(material, this);
                 }
@@ -147,8 +147,8 @@ namespace fgui {
                 if (!material) {
                     material = (<any>cc.Material).getBuiltinMaterial('2d-sprite', this);
                 }
-                if ((<any>cc.Material).getInstantiatedMaterial) {
-                    material = this._spriteMaterial = (<any>cc.Material).getInstantiatedMaterial(material, this);
+                if ((<any>cc.MaterialVariant).create) {
+                    material = this._spriteMaterial = (<any>cc.MaterialVariant).create(material, this);
                 } else {
                     material = this._spriteMaterial = (<any>cc.Material).create(material, this);
                 }
