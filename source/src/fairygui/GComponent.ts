@@ -822,10 +822,16 @@ namespace fgui {
                 return null;
         }
 
-        public setBoundsChangedFlag(): void {
+        public setBoundsChangedFlag(forceUpdate: boolean = false): void {
             if (!this._scrollPane && !this._trackBounds)
                 return;
 
+            if (forceUpdate) {
+                //强制刷新
+                this._boundsChanged = true;
+                this.refresh();
+                return;
+            }
             if (!this._boundsChanged) {
                 this._boundsChanged = true;
 

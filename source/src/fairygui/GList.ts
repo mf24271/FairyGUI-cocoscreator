@@ -1059,6 +1059,13 @@ namespace fgui {
             this.setVirtualListChangedFlag(false);
         }
 
+        //强制刷新界面，该方法不要频繁调用
+        public refreshList() {
+            if (!this._virtual) {
+                this.setBoundsChangedFlag(true);
+            }
+        }
+
         private checkVirtualList(): void {
             if (this._virtualListChanged != 0) {
                 this._refreshVirtualList();
