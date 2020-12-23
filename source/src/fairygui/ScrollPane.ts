@@ -1574,7 +1574,8 @@ namespace fgui {
                 //这里有一些阈值的处理，因为在低速内，不希望产生较大的滚动（甚至不滚动）
                 var ratio: number = 0;
 
-                if (this._pageMode || !isMobile) {
+                //if (this._pageMode || !isMobile) {
+                if (this._pageMode || true) {
                     if (v2 > 500)
                         ratio = Math.pow((v2 - 500) / 500, 2);
                 }
