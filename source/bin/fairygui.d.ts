@@ -405,7 +405,7 @@ declare namespace fgui {
         dispose(): void;
         protected onEnable(): void;
         protected onDisable(): void;
-        protected onUpdate(): void;
+        protected onUpdate(dt?: number): void;
         protected onDestroy(): void;
         onClick(listener: Function, target?: any): void;
         offClick(listener: Function, target?: any): void;
@@ -543,7 +543,7 @@ declare namespace fgui {
         protected handleGrayedChanged(): void;
         handleControllerChanged(c: Controller): void;
         hitTest(globalPt: cc.Vec2): GObject;
-        setBoundsChangedFlag(): void;
+        setBoundsChangedFlag(forceUpdate?: boolean): void;
         private refresh;
         ensureBoundsCorrect(): void;
         protected updateBounds(): void;
@@ -923,6 +923,7 @@ declare namespace fgui {
         get numItems(): number;
         set numItems(value: number);
         refreshVirtualList(): void;
+        refreshList(): void;
         private checkVirtualList;
         private setVirtualListChangedFlag;
         private _refreshVirtualList;
@@ -1315,6 +1316,7 @@ declare namespace fgui {
         playOneShotSound(clip: cc.AudioClip, volumeScale?: number): void;
         private adjustModalLayer;
         private onTouchBegin_1;
+        private onWinResizeOld;
         private onWinResize;
         handlePositionChanged(): void;
         private updateContentScaleLevel;

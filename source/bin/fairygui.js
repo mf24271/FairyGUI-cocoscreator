@@ -48,7 +48,8 @@ window.__extends = (this && this.__extends) || (function () {
         };
         AsyncOperation.prototype.internalCreateObject = function (item) {
             this._node = new cc.Node("[AsyncCreating:" + item.name + "]");
-            this._node.parent = cc.director.getScene();
+            var node = cc.Canvas.instance.node.getChildByName("node_fgui_root");
+            this._node.parent = node;
             this._node.on("#", this.completed, this);
             this._node.addComponent(AsyncOperationRunner).init(item);
         };
@@ -1548,7 +1549,7 @@ window.__extends = (this && this.__extends) || (function () {
         };
         GObject.prototype.onDisable = function () {
         };
-        GObject.prototype.onUpdate = function () {
+        GObject.prototype.onUpdate = function (dt) {
         };
         GObject.prototype.onDestroy = function () {
         };
@@ -2694,9 +2695,15 @@ window.__extends = (this && this.__extends) || (function () {
             else
                 return null;
         };
-        GComponent.prototype.setBoundsChangedFlag = function () {
+        GComponent.prototype.setBoundsChangedFlag = function (forceUpdate) {
+            if (forceUpdate === void 0) { forceUpdate = false; }
             if (!this._scrollPane && !this._trackBounds)
                 return;
+            if (forceUpdate) {
+                this._boundsChanged = true;
+                this.refresh();
+                return;
+            }
             if (!this._boundsChanged) {
                 this._boundsChanged = true;
                 this._partner.callLater(this.refresh);
@@ -5936,6 +5943,11 @@ window.__extends = (this && this.__extends) || (function () {
         GList.prototype.refreshVirtualList = function () {
             this.setVirtualListChangedFlag(false);
         };
+        GList.prototype.refreshList = function () {
+            if (!this._virtual) {
+                this.setBoundsChangedFlag(true);
+            }
+        };
         GList.prototype.checkVirtualList = function () {
             if (this._virtualListChanged != 0) {
                 this._refreshVirtualList();
@@ -7362,9 +7374,10 @@ window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         GLoader.prototype.loadContent = function () {
-            this.clearContent();
-            if (!this._url)
+            if (!this._url) {
+                this.clearContent();
                 return;
+            }
             if (fgui.ToolSet.startsWith(this._url, "ui://"))
                 this.loadFromPackage(this._url);
             else
@@ -7429,8 +7442,15 @@ window.__extends = (this && this.__extends) || (function () {
                 || fgui.ToolSet.startsWith(this._url, "https://")
                 || fgui.ToolSet.startsWith(this._url, '/'))
                 cc.loader.load(this._url, this.onLoaded.bind(this));
-            else
-                cc.loader.loadRes(this._url, cc.Asset, this.onLoaded.bind(this));
+            else {
+                var asset = cc.loader.getRes(this._url);
+                if (!asset) {
+                    cc.loader.loadRes(this._url, cc.Asset, this.onLoaded.bind(this));
+                }
+                else {
+                    this.onLoaded(null, asset);
+                }
+            }
         };
         GLoader.prototype.onLoaded = function (err, asset) {
             if (!this._url || !cc.isValid(this._node))
@@ -9145,6 +9165,8 @@ window.__extends = (this && this.__extends) || (function () {
             else {
                 cc.view.on('canvas-resize', _this._thisOnResized);
             }
+            var node = cc.Canvas.instance.node.getChildByName("node_fgui_root");
+            node.on('size-changed', _this._thisOnResized);
             _this.onWinResize();
             return _this;
         }
@@ -9159,7 +9181,8 @@ window.__extends = (this && this.__extends) || (function () {
         });
         GRoot.create = function () {
             GRoot._inst = new GRoot();
-            GRoot._inst.node.parent = cc.director.getScene();
+            var node = cc.Canvas.instance.node.getChildByName("node_fgui_root");
+            GRoot._inst.node.parent = node;
             return GRoot._inst;
         };
         GRoot.prototype.onDestroy = function () {
@@ -9169,6 +9192,8 @@ window.__extends = (this && this.__extends) || (function () {
             else {
                 cc.view.off('canvas-resize', this._thisOnResized);
             }
+            var node = cc.Canvas.instance.node.getChildByName("node_fgui_root");
+            node.off('size-changed', this._thisOnResized);
             if (this == GRoot._inst)
                 GRoot._inst = null;
         };
@@ -9475,13 +9500,25 @@ window.__extends = (this && this.__extends) || (function () {
                 this._popupStack.length = 0;
             }
         };
-        GRoot.prototype.onWinResize = function () {
+        GRoot.prototype.onWinResizeOld = function () {
             var size = cc.view.getCanvasSize();
             size.width /= cc.view.getScaleX();
             size.height /= cc.view.getScaleY();
             var pos = cc.view.getViewportRect().origin;
             pos.x = pos.x / cc.view.getScaleX();
             pos.y = pos.y / cc.view.getScaleY();
+            this.setSize(size.width, size.height);
+            this._node.setPosition(-pos.x, this._height - pos.y);
+            this.updateContentScaleLevel();
+        };
+        GRoot.prototype.onWinResize = function () {
+            var node = cc.Canvas.instance.node.getChildByName("node_fgui_root");
+            console.log(node, node.width, node.height);
+            var size = cc.size(node.width, node.height);
+            var pos = cc.view.getViewportRect().origin;
+            pos.x = 0;
+            pos.y = 0;
+            console.log("fgui root size", size);
             this.setSize(size.width, size.height);
             this._node.setPosition(-pos.x, this._height - pos.y);
             this.updateContentScaleLevel();
@@ -15823,8 +15860,8 @@ window.__extends = (this && this.__extends) || (function () {
                     if (!material) {
                         material = cc.Material.getBuiltinMaterial('2d-gray-sprite');
                     }
-                    if (cc.Material.getInstantiatedMaterial) {
-                        material = this._graySpriteMaterial = cc.Material.getInstantiatedMaterial(material, this);
+                    if (cc.MaterialVariant.create) {
+                        material = this._graySpriteMaterial = cc.MaterialVariant.create(material, this);
                     }
                     else {
                         material = this._graySpriteMaterial = cc.Material.create(material, this);
@@ -15835,8 +15872,8 @@ window.__extends = (this && this.__extends) || (function () {
                     if (!material) {
                         material = cc.Material.getBuiltinMaterial('2d-sprite', this);
                     }
-                    if (cc.Material.getInstantiatedMaterial) {
-                        material = this._spriteMaterial = cc.Material.getInstantiatedMaterial(material, this);
+                    if (cc.MaterialVariant.create) {
+                        material = this._spriteMaterial = cc.MaterialVariant.create(material, this);
                     }
                     else {
                         material = this._spriteMaterial = cc.Material.create(material, this);
