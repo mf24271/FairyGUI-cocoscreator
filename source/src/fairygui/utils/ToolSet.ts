@@ -3,6 +3,7 @@
 namespace fgui {
 
     export class ToolSet {
+        static time = Date.now();
         public constructor() {
         }
 
@@ -63,6 +64,10 @@ namespace fgui {
 
         public static distance(x1: number, y1: number, x2: number, y2: number): number {
             return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
+        }
+
+        public static log(...anyArg: any[]) {
+            console.log.apply(console, [`[${(Date.now() - ToolSet.time) / 1000}]`].concat(anyArg));
         }
     }
 }

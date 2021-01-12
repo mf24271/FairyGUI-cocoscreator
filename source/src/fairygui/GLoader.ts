@@ -241,7 +241,7 @@ namespace fgui {
         }
 
         protected loadContent(): void {
-            if (!this._url){
+            if (!this._url) {
                 //清空
                 this.clearContent();
                 return;
@@ -254,6 +254,7 @@ namespace fgui {
         }
 
         protected loadFromPackage(itemURL: string) {
+            this.clearContent()
             this._contentItem = UIPackage.getItemByURL(itemURL);
             if (this._contentItem != null) {
                 this._contentItem = this._contentItem.getBranch();
@@ -315,13 +316,13 @@ namespace fgui {
                 || ToolSet.startsWith(this._url, "https://")
                 || ToolSet.startsWith(this._url, '/'))
                 cc.loader.load(this._url, this.onLoaded.bind(this));
-            else{
+            else {
                 let asset = cc.loader.getRes(this._url);
-                if(!asset){
+                if (!asset) {
                     cc.loader.loadRes(this._url, cc.Asset, this.onLoaded.bind(this));
-                }else{
+                } else {
                     //已经加载过缓存
-                    this.onLoaded(null,asset);
+                    this.onLoaded(null, asset);
                 }
             }
         }
@@ -331,7 +332,8 @@ namespace fgui {
 
             if (!this._url || !cc.isValid(this._node))
                 return;
-
+            //设置前先清理一下
+            this.clearContent();
             asset = cc.loader.getRes(this._url);
             if (!asset)
                 return;
@@ -595,6 +597,10 @@ namespace fgui {
 
             if (this._url)
                 this.loadContent();
+        }
+
+        public setMaskMaterial(material: cc.Material) {
+            this._content.setCustomMaterial(material)
         }
     }
 }

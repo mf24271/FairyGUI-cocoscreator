@@ -1033,6 +1033,7 @@ declare namespace fgui {
         getProp(index: number): any;
         setProp(index: number, value: any): void;
         setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void;
+        setMaskMaterial(material: cc.Material): void;
     }
 }
 declare namespace fgui {
@@ -2100,6 +2101,7 @@ declare namespace fgui {
         private _grayed;
         private _graySpriteMaterial;
         private _spriteMaterial;
+        private _maskMaterial;
         constructor();
         get flip(): FlipType;
         set flip(value: FlipType);
@@ -2114,6 +2116,7 @@ declare namespace fgui {
         private setupFill;
         get grayed(): boolean;
         set grayed(value: boolean);
+        setCustomMaterial(material: cc.Material): void;
     }
 }
 declare namespace fgui {
@@ -2711,6 +2714,7 @@ declare namespace fgui {
 }
 declare namespace fgui {
     class ToolSet {
+        static time: number;
         constructor();
         static startsWith(source: string, str: string, ignoreCase?: boolean): boolean;
         static encodeHTML(str: string): string;
@@ -2721,6 +2725,7 @@ declare namespace fgui {
         static toGrayed(c: cc.Color): cc.Color;
         static repeat(t: number, length: number): number;
         static distance(x1: number, y1: number, x2: number, y2: number): number;
+        static log(...anyArg: any[]): void;
     }
 }
 import fairygui = fgui;

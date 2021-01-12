@@ -81,6 +81,7 @@ namespace fgui {
         }
 
         public static loadPackage(url: string, completeCallback: ((error: any) => void) | null): void {
+            ToolSet.log("load package++", url);
             cc.loader.loadRes(url, function (err, asset) {
                 if (err) {
                     completeCallback(err);
@@ -96,12 +97,14 @@ namespace fgui {
                 let urls = [];
                 for (var i: number = 0; i < cnt; i++) {
                     var pi: PackageItem = pkg._items[i];
-                    if (pi.type == PackageItemType.Atlas || pi.type == PackageItemType.Sound)
+                    if (pi.type == PackageItemType.Atlas || pi.type == PackageItemType.Sound) {
                         urls.push(pi.file);
+                    }
                 }
 
                 cc.loader.loadResArray(urls, function (err, assets) {
                     if (!err) {
+                        ToolSet.log("load package--", url, pkg.id, pkg.name)
                         UIPackage._instById[pkg.id] = pkg;
                         UIPackage._instByName[pkg.name] = pkg;
                     }

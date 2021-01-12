@@ -10,6 +10,7 @@ namespace fgui {
         private _grayed: boolean = false;
         private _graySpriteMaterial: cc.Material;
         private _spriteMaterial: cc.Material;
+        private _maskMaterial: cc.Material;
 
         public constructor() {
             super();
@@ -131,7 +132,14 @@ namespace fgui {
 
             this._grayed = value;
             let material;
-            if (value) {
+            if (this._maskMaterial != null) {
+                if ((<any>cc.MaterialVariant).create) {
+                    material = (<any>cc.MaterialVariant).create(this._maskMaterial, this);
+                } else {
+                    material = (<any>cc.Material).create(this._maskMaterial, this);
+                }
+                material.setProperty("gray", value ? 1 : 0)
+            } else if (value) {
                 material = this._graySpriteMaterial;
                 if (!material) {
                     material = (<any>cc.Material).getBuiltinMaterial('2d-gray-sprite');
@@ -156,5 +164,13 @@ namespace fgui {
 
             this.setMaterial(0, material);
         };
+
+        public setCustomMaterial(material: cc.Material) {
+            this._maskMaterial = material
+            let old = this._grayed
+            this._grayed = !old
+
+            this.grayed = old
+        }
     }
 }

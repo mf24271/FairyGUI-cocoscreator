@@ -7384,6 +7384,7 @@ window.__extends = (this && this.__extends) || (function () {
                 this.loadExternal();
         };
         GLoader.prototype.loadFromPackage = function (itemURL) {
+            this.clearContent();
             this._contentItem = fgui.UIPackage.getItemByURL(itemURL);
             if (this._contentItem != null) {
                 this._contentItem = this._contentItem.getBranch();
@@ -7455,6 +7456,7 @@ window.__extends = (this && this.__extends) || (function () {
         GLoader.prototype.onLoaded = function (err, asset) {
             if (!this._url || !cc.isValid(this._node))
                 return;
+            this.clearContent();
             asset = cc.loader.getRes(this._url);
             if (!asset)
                 return;
@@ -7682,6 +7684,9 @@ window.__extends = (this && this.__extends) || (function () {
             }
             if (this._url)
                 this.loadContent();
+        };
+        GLoader.prototype.setMaskMaterial = function (material) {
+            this._content.setCustomMaterial(material);
         };
         GLoader._errorSignPool = new fgui.GObjectPool();
         return GLoader;
@@ -13008,7 +13013,7 @@ window.__extends = (this && this.__extends) || (function () {
                 if (isMobile)
                     v2 *= 1136 / Math.max(cc.winSize.width, cc.winSize.height);
                 var ratio = 0;
-                if (this._pageMode || !isMobile) {
+                if (this._pageMode || true) {
                     if (v2 > 500)
                         ratio = Math.pow((v2 - 500) / 500, 2);
                 }
@@ -14686,6 +14691,7 @@ window.__extends = (this && this.__extends) || (function () {
             return pkg;
         };
         UIPackage.loadPackage = function (url, completeCallback) {
+            fgui.ToolSet.log("load package++", url);
             cc.loader.loadRes(url, function (err, asset) {
                 if (err) {
                     completeCallback(err);
@@ -14699,11 +14705,13 @@ window.__extends = (this && this.__extends) || (function () {
                 var urls = [];
                 for (var i = 0; i < cnt; i++) {
                     var pi = pkg._items[i];
-                    if (pi.type == fgui.PackageItemType.Atlas || pi.type == fgui.PackageItemType.Sound)
+                    if (pi.type == fgui.PackageItemType.Atlas || pi.type == fgui.PackageItemType.Sound) {
                         urls.push(pi.file);
+                    }
                 }
                 cc.loader.loadResArray(urls, function (err, assets) {
                     if (!err) {
+                        fgui.ToolSet.log("load package--", url, pkg.id, pkg.name);
                         UIPackage._instById[pkg.id] = pkg;
                         UIPackage._instByName[pkg.name] = pkg;
                     }
@@ -15855,7 +15863,16 @@ window.__extends = (this && this.__extends) || (function () {
                     return;
                 this._grayed = value;
                 var material;
-                if (value) {
+                if (this._maskMaterial != null) {
+                    if (cc.MaterialVariant.create) {
+                        material = cc.MaterialVariant.create(this._maskMaterial, this);
+                    }
+                    else {
+                        material = cc.Material.create(this._maskMaterial, this);
+                    }
+                    material.setProperty("gray", value ? 1 : 0);
+                }
+                else if (value) {
                     material = this._graySpriteMaterial;
                     if (!material) {
                         material = cc.Material.getBuiltinMaterial('2d-gray-sprite');
@@ -15885,6 +15902,12 @@ window.__extends = (this && this.__extends) || (function () {
             configurable: true
         });
         ;
+        Image.prototype.setCustomMaterial = function (material) {
+            this._maskMaterial = material;
+            var old = this._grayed;
+            this._grayed = !old;
+            this.grayed = old;
+        };
         return Image;
     }(cc.Sprite));
     fgui.Image = Image;
@@ -19129,6 +19152,14 @@ window.__extends = (this && this.__extends) || (function () {
         ToolSet.distance = function (x1, y1, x2, y2) {
             return Math.sqrt(Math.pow(x1 - x2, 2) + Math.pow(y1 - y2, 2));
         };
+        ToolSet.log = function () {
+            var anyArg = [];
+            for (var _i = 0; _i < arguments.length; _i++) {
+                anyArg[_i] = arguments[_i];
+            }
+            console.log.apply(console, ["[" + (Date.now() - ToolSet.time) / 1000 + "]"].concat(anyArg));
+        };
+        ToolSet.time = Date.now();
         return ToolSet;
     }());
     fgui.ToolSet = ToolSet;
