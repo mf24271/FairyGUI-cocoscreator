@@ -599,7 +599,7 @@ namespace fgui {
                 this.loadContent();
         }
 
-        public setMaskMaterial(material: cc.Material) {
+        public setMaskMaterial(material: GMaterialInfo) {
             this._content.setCustomMaterial(material)
         }
     }

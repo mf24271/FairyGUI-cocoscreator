@@ -10,7 +10,7 @@ namespace fgui {
         private _grayed: boolean = false;
         private _graySpriteMaterial: cc.Material;
         private _spriteMaterial: cc.Material;
-        private _maskMaterial: cc.Material;
+        private _maskMaterial: GMaterialInfo;
 
         public constructor() {
             super();
@@ -133,12 +133,16 @@ namespace fgui {
             this._grayed = value;
             let material;
             if (this._maskMaterial != null) {
-                if ((<any>cc.MaterialVariant).create) {
-                    material = (<any>cc.MaterialVariant).create(this._maskMaterial, this);
-                } else {
-                    material = (<any>cc.Material).create(this._maskMaterial, this);
+                let temp = this._maskMaterial.normal
+                if (value) {
+                    temp = this._maskMaterial.gray
                 }
-                material.setProperty("gray", value ? 1 : 0)
+                if ((<any>cc.MaterialVariant).create) {
+                    material = (<any>cc.MaterialVariant).create(temp, this);
+                } else {
+                    material = (<any>cc.Material).create(temp, this);
+                }
+                // material.setProperty("gray", value ? 1 : 0)
             } else if (value) {
                 material = this._graySpriteMaterial;
                 if (!material) {
@@ -165,12 +169,27 @@ namespace fgui {
             this.setMaterial(0, material);
         };
 
-        public setCustomMaterial(material: cc.Material) {
+        public setCustomMaterial(material: GMaterialInfo) {
             this._maskMaterial = material
             let old = this._grayed
             this._grayed = !old
 
             this.grayed = old
+        }
+    }
+
+    export class GMaterialInfo {
+        private _normal: cc.Material
+        private _gray: cc.Material
+        public constructor(normal: cc.Material, gray: cc.Material) {
+            this._normal = normal
+            this._gray = gray
+        }
+        public get normal(): cc.Material {
+            return this._normal;
+        }
+        public get gray(): cc.Material {
+            return this._gray;
         }
     }
 }
