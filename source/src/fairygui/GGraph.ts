@@ -202,6 +202,39 @@ namespace fgui {
                 super.setProp(index, value);
         }
 
+        protected _hitTest(pt: cc.Vec2): GObject {
+            if (pt.x >= 0 && pt.y >= 0 && pt.x < this._width && pt.y < this._height) {
+                if (this._type == 3) {
+                    let points = this._polygonPoints;
+                    let len: number = points.length / 2;
+                    let i: number;
+                    let j: number = len - 1;
+                    let oddNodes: boolean = false;
+                    let w: number = this._width;
+                    let h: number = this._height;
+
+                    for (i = 0; i < len; ++i) {
+                        let ix: number = points[i * 2];
+                        let iy: number = points[i * 2 + 1];
+                        let jx: number = points[j * 2];
+                        let jy: number = points[j * 2 + 1];
+                        if ((iy < pt.y && jy >= pt.y || jy < pt.y && iy >= pt.y) && (ix <= pt.x || jx <= pt.x)) {
+                            if (ix + (pt.y - iy) / (jy - iy) * (jx - ix) < pt.x)
+                                oddNodes = !oddNodes;
+                        }
+
+                        j = i;
+                    }
+
+                    return oddNodes ? this : null;
+                }
+                else
+                    return this;
+            }
+            else
+                return null;
+        }
+
         public setup_beforeAdd(buffer: ByteBuffer, beginPos: number): void {
             super.setup_beforeAdd(buffer, beginPos);
 
